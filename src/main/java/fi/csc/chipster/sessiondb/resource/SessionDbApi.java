@@ -7,10 +7,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +32,7 @@ import fi.csc.chipster.sessiondb.model.SessionEvent;
 import fi.csc.chipster.sessiondb.model.SessionEvent.EventType;
 import fi.csc.chipster.sessiondb.model.SessionEvent.ResourceType;
 import fi.csc.chipster.sessiondb.model.SessionState;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 
 public class SessionDbApi {
@@ -70,12 +71,16 @@ public class SessionDbApi {
 				hibernate.session());
 
 		Set<String> usernames = sessionRules.stream()
-				// don't inform about the example sessions
+		        .filter(r -> r.getUsername() != null)
+		        // don't inform about the example sessions
 				.filter(r -> !RuleTable.EVERYONE.equals(r.getUsername())).map(r -> r.getUsername())
 				.collect(Collectors.toSet());
 
-		// when session is being shared, the recipient is not in the session yet
-		usernames.add(rule.getUsername());
+		// it seems to be possible to create a Rule with null username by leaving the recipient empty
+		if (rule.getUsername() != null) {
+    		// when session is being shared, the recipient is not in the session yet		
+    		usernames.add(rule.getUsername());
+		}
 
 		// send events to username topics to update the session list
 		for (String username : usernames) {
@@ -206,8 +211,7 @@ public class SessionDbApi {
 		if (dataset.getFile() != null && dataset.getFile().getFileId() != null) {
 			UUID fileId = dataset.getFile().getFileId();
 
-			@SuppressWarnings("unchecked")
-			List<Dataset> fileDatasets = hibernateSession.createQuery("from Dataset where file=:file")
+			List<Dataset> fileDatasets = hibernateSession.createQuery("from Dataset where file=:file", Dataset.class)
 					.setParameter("file", dataset.getFile()).list();
 
 			// don't care about the dataset that is being deleted
@@ -359,6 +363,11 @@ public class SessionDbApi {
 	}
 
 	public UUID createRule(Rule newRule, Session session) {
+	    
+	    // it doesn't make sense to share to null
+	    if (newRule.getUsername() == null) {
+	        throw new BadRequestException("username cannot be null");
+	    }
 
 		newRule.setRuleId(RestUtils.createUUID());
 

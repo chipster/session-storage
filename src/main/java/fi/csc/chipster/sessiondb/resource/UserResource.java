@@ -37,8 +37,7 @@ public class UserResource {
 	@Transaction
 	public Response getAll(@Context SecurityContext sc) {
 
-		@SuppressWarnings("unchecked")
-		List<String> users = hibernate.session().createQuery("select distinct(username) from Rule").list();
+		List<String> users = hibernate.session().createQuery("select distinct(username) from Rule", String.class).list();
 
 		// everyone isn't a real user
 		users.remove(RuleTable.EVERYONE);

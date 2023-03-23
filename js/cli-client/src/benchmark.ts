@@ -475,7 +475,7 @@ export default class Benchmark {
           module: "misc",
           parameters: [],
           screenOutput: "",
-          state: "COMPLETED",
+          state: "RUNNING",
           stateDetail: "",
           toolCategory: "Utilitites",
           toolId: "benchmark-tool.py",

@@ -9,15 +9,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.query.Query;
-import org.hibernate.type.DateType;
 
 import fi.csc.chipster.auth.model.Role;
 import fi.csc.chipster.rest.AdminResource;
@@ -194,10 +194,10 @@ public class JobHistoryResource extends AdminResource {
 		}
 		sql = sql + " ;";
 
-		Query query = hibernate.session().createNativeQuery(sql);
+		Query query = hibernate.session().createNativeQuery(sql, BigInteger.class);
 
-		query = query.setParameter("starttime", startTime, DateType.INSTANCE).setParameter("endtime", endTime,
-				DateType.INSTANCE);
+		query = query.setParameter("starttime", startTime, TemporalType.TIMESTAMP).setParameter("endtime", endTime,
+		        TemporalType.TIMESTAMP);
 
 		if (useModuleFilter) {
 			query = query.setParameter("module", module);

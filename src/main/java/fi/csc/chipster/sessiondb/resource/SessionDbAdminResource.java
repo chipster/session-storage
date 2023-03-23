@@ -106,10 +106,9 @@ public class SessionDbAdminResource extends AdminResource {
 	@Transaction
 	public Object getStorages(@Context SecurityContext sc) {
 
-		@SuppressWarnings("unchecked")
 		List<Object[]> dbStorages = hibernate.session()
 				.createQuery(
-						"select storage, count(*), sum(size) from " + File.class.getSimpleName() + " group by storage")
+						"select storage, count(*), sum(size) from " + File.class.getSimpleName() + " group by storage", Object[].class)
 				.getResultList();
 
 		ArrayList<HashMap<String, Object>> storages = new ArrayList<>();
@@ -136,16 +135,16 @@ public class SessionDbAdminResource extends AdminResource {
 
 		final String SELECT_COUNT = "select count(*) ";
 
-		BigInteger orphanFiles = (BigInteger) hibernate.session().createNativeQuery(SELECT_COUNT + SQL_ORPHAN_FILES)
+		BigInteger orphanFiles = hibernate.session().createNativeQuery(SELECT_COUNT + SQL_ORPHAN_FILES, BigInteger.class)
 				.getSingleResult();
-		BigInteger orphanDatasets = (BigInteger) hibernate.session()
-				.createNativeQuery(SELECT_COUNT + SQL_ORPHAN_DATASETS).getSingleResult();
-		BigInteger orphanJobs = (BigInteger) hibernate.session().createNativeQuery(SELECT_COUNT + SQL_ORPHAN_JOBS)
+		BigInteger orphanDatasets = hibernate.session()
+				.createNativeQuery(SELECT_COUNT + SQL_ORPHAN_DATASETS, BigInteger.class).getSingleResult();
+		BigInteger orphanJobs = hibernate.session().createNativeQuery(SELECT_COUNT + SQL_ORPHAN_JOBS, BigInteger.class)
 				.getSingleResult();
-		BigInteger orphanRules = (BigInteger) hibernate.session().createNativeQuery(SELECT_COUNT + SQL_ORPHAN_RULES)
+		BigInteger orphanRules = hibernate.session().createNativeQuery(SELECT_COUNT + SQL_ORPHAN_RULES, BigInteger.class)
 				.getSingleResult();
-		BigInteger orphanSessions = (BigInteger) hibernate.session()
-				.createNativeQuery(SELECT_COUNT + SQL_ORPHAN_SESSIONS).getSingleResult();
+		BigInteger orphanSessions = hibernate.session()
+				.createNativeQuery(SELECT_COUNT + SQL_ORPHAN_SESSIONS, BigInteger.class).getSingleResult();
 
 		HashMap<String, Object> orphans = new HashMap<String, Object>() {
 			{
@@ -173,11 +172,11 @@ public class SessionDbAdminResource extends AdminResource {
 
 		final String DELETE = "delete ";
 
-		int orphanSessions = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_SESSIONS).executeUpdate();
-		int orphanRules = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_RULES).executeUpdate();
-		int orphanJobs = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_JOBS).executeUpdate();
-		int orphanDatasets = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_DATASETS).executeUpdate();
-		int orphanFiles = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_FILES).executeUpdate();
+		int orphanSessions = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_SESSIONS, Void.class).executeUpdate();
+		int orphanRules = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_RULES, Void.class).executeUpdate();
+		int orphanJobs = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_JOBS, Void.class).executeUpdate();
+		int orphanDatasets = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_DATASETS, Void.class).executeUpdate();
+		int orphanFiles = hibernate.session().createNativeQuery(DELETE + SQL_ORPHAN_FILES, Void.class).executeUpdate();
 
 		HashMap<String, Object> orphans = new HashMap<String, Object>() {
 			{
@@ -213,8 +212,7 @@ public class SessionDbAdminResource extends AdminResource {
 	@Transaction
 	public Response getQuota(@PathParam("username") String username, @Context SecurityContext sc) {
 
-		@SuppressWarnings("unchecked")
-		List<Rule> rules = hibernate.session().createQuery("from Rule where username=:username")
+		List<Rule> rules = hibernate.session().createQuery("from Rule where username=:username", Rule.class)
 				.setParameter("username", username).list();
 
 		List<Dataset> datasets = rules.stream().map(rule -> rule.getSession())
@@ -228,12 +226,12 @@ public class SessionDbAdminResource extends AdminResource {
 
 		Long size = uniqueFiles.values().stream().collect(Collectors.summingLong(file -> file.getSize()));
 
-		Long readWriteSessions = (Long) hibernate.session()
-				.createQuery("select count(*) from Rule where username=:username and readWrite=true")
+		Long readWriteSessions = hibernate.session()
+				.createQuery("select count(*) from Rule where username=:username and readWrite=true", Long.class)
 				.setParameter("username", username).uniqueResult();
 
-		Long readOnlySessions = (Long) hibernate.session()
-				.createQuery("select count(*) from Rule where username=:username and readWrite=false")
+		Long readOnlySessions = hibernate.session()
+				.createQuery("select count(*) from Rule where username=:username and readWrite=false", Long.class)
 				.setParameter("username", username).uniqueResult();
 
 		HashMap<String, Object> responseObj = new HashMap<String, Object>() {
@@ -255,8 +253,7 @@ public class SessionDbAdminResource extends AdminResource {
 	@Transaction
 	public Response getSessions(@PathParam("username") String username, @Context SecurityContext sc) {
 
-		@SuppressWarnings("unchecked")
-		List<Rule> rules = hibernate.session().createQuery("from Rule where username=:username")
+		List<Rule> rules = hibernate.session().createQuery("from Rule where username=:username", Rule.class)
 				.setParameter("username", username).list();
 
 		List<Session> sessions = rules.stream().map(rule -> rule.getSession()).collect(Collectors.toList());

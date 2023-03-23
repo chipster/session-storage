@@ -77,8 +77,7 @@ public class UserTable {
 		return get(userId, this.hibernate.session());
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<User> getAll() {
-		return this.hibernate.session().createQuery("from " + User.class.getSimpleName()).list();
+		return this.hibernate.session().createQuery("from " + User.class.getSimpleName(), User.class).list();
 	}
 }

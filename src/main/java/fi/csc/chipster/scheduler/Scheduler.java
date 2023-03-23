@@ -347,6 +347,11 @@ public class Scheduler implements SessionEventListener, StatusSource, JobSchedul
 				return;
 			}
 			
+			if (tool == null) {
+			    logger.error("cannot schedule new job " + jobIdPair + ". Tool not found: " + job.getToolId());
+                return;
+			}
+			
 			try {
 				runtime = this.toolbox.getRuntime(tool.getRuntime());
 				

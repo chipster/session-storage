@@ -50,9 +50,8 @@ public class GlobalJobResource {
 			// throws if invalid
 			JobState state = JobState.valueOf(stateString);
 			
-			@SuppressWarnings("unchecked")
 			List<Job> jobs = hibernate.session()
-					.createQuery("from Job where state=:state")
+					.createQuery("from Job where state=:state", Job.class)
 					.setParameter("state", state)
 					.list();
 			

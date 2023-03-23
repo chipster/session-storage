@@ -9,11 +9,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.persistence.NoResultException;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -132,15 +132,13 @@ public class RuleTable {
 				.collect(Collectors.toList());
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Rule> getRules(UUID sessionId) {
-		return hibernate.session().createQuery("from Rule where sessionId=:sessionId")
+		return hibernate.session().createQuery("from Rule where session.sessionId=:sessionId", Rule.class)
 				.setParameter("sessionId", sessionId).list();
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Rule> getShares(String userIdString) {
-		return hibernate.session().createQuery("from Rule where sharedBy=:sharedBy")
+		return hibernate.session().createQuery("from Rule where sharedBy=:sharedBy", Rule.class)
 				.setParameter("sharedBy", userIdString).list();
 	}
 
@@ -162,7 +160,7 @@ public class RuleTable {
 							Query<Rule> query = hibernateSession.createQuery("from Rule", Rule.class);
 							query.setReadOnly(true);
 
-							ScrollableResults results = query.scroll(ScrollMode.FORWARD_ONLY);
+							ScrollableResults<Rule> results = query.scroll(ScrollMode.FORWARD_ONLY);
 
 							JsonGenerator jg = RestUtils.getObjectMapper(false).getFactory().createGenerator(output,
 									JsonEncoding.UTF8);
@@ -171,7 +169,7 @@ public class RuleTable {
 							// iterate over results
 							while (results.next()) {
 								// process row then release reference
-								Rule row = (Rule) results.get()[0];
+								Rule row = results.get();
 								jg.writeObject(row);
 								jg.flush();
 								// you may need to flush every now and then

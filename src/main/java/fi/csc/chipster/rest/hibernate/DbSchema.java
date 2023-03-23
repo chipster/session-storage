@@ -18,7 +18,6 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
 import org.hibernate.tool.schema.spi.SchemaManagementException;
-import org.hibernate.usertype.UserType;
 
 public class DbSchema {
 	
@@ -54,6 +53,7 @@ public class DbSchema {
      * 
      * @param hibernateClasses
      * @param file
+	 * @param dialect 
 	 * @param driver 
 	 * @param url 
 	 * @param url 
@@ -63,15 +63,18 @@ public class DbSchema {
      */
     public void exportHibernateSchema(List<Class<?>> hibernateClasses, String file, String dialect) {
     	
-    	logger.info("export hibernate schema " + dialect + " to " + file);
+    	logger.info("export hibernate schema to " + file);
     	
-    	Map<String, String> settings = new HashMap<>();
-		settings.put(Environment.DIALECT, dialect);
+    	Map<String, Object> settings = new HashMap<>();
+    	
+    	settings.put(Environment.DIALECT, dialect);
 
 		/* Do not start connection pool
 		 * 
 		 * Schema export shouldn't try to connect to the real database, but it does, at least in 
-		 * Hibernate 5.4.25. This magic configuration in JdbcEnvironmentInitiator seems to disable it. 
+		 * Hibernate 5.4.25. This magic configuration in JdbcEnvironmentInitiator seems to disable it.
+		 * 
+		 * Update: still does in Hibernate 6.1.7
 		 */
 		settings.put("hibernate.temp.use_jdbc_metadata_defaults", "false");
  
@@ -86,10 +89,10 @@ public class DbSchema {
 		
 		MetadataBuilder metadataBuilder = metadata.getMetadataBuilder();
 				
-		HashMap<String, UserType> types = HibernateUtil.getUserTypes(); 		
-		for (String name : types.keySet()) {
-			metadataBuilder.applyBasicType(types.get(name), name);
-		}		                
+//		HashMap<String, UserType> types = HibernateUtil.getUserTypes(); 		
+//		for (String name : types.keySet()) {
+//			metadataBuilder.applyBasicType(types.get(name), name);
+//		}		                
         
         File exportFile = new File(file);
         if (exportFile.exists()) {

@@ -87,12 +87,7 @@ public class DbSchema {
 			metadata.addAnnotatedClass(c);
 		}
 		
-		MetadataBuilder metadataBuilder = metadata.getMetadataBuilder();
-				
-//		HashMap<String, UserType> types = HibernateUtil.getUserTypes(); 		
-//		for (String name : types.keySet()) {
-//			metadataBuilder.applyBasicType(types.get(name), name);
-//		}		                
+		MetadataBuilder metadataBuilder = metadata.getMetadataBuilder();	                
         
         File exportFile = new File(file);
         if (exportFile.exists()) {

@@ -145,6 +145,9 @@ public class RuleTable {
 	/**
 	 * Stream the whole table as a json array
 	 * 
+	 * This is not used at the moment, but let's keep this as an example for now in case we need to 
+	 * stream through any of the larger tables in the future.
+	 * 
 	 * @return
 	 */
 	public Response getRules() {

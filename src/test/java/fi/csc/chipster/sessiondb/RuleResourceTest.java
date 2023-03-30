@@ -53,6 +53,9 @@ public class RuleResourceTest {
 				launcher.getServiceLocator(), 
 				new AuthenticationClient(launcher.getServiceLocator(), "jaas/example_session_owner", "example_session_owner", Role.CLIENT).getCredentials(),
 				Role.CLIENT);
+		
+		
+		
     }
 
     @AfterAll

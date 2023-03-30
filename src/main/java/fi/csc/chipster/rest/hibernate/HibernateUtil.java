@@ -71,6 +71,7 @@ public class HibernateUtil {
 		String user = config.getString(CONF_DB_USER, role);
 		String password = config.getString(CONF_DB_PASS, role);
 		String dialect = config.getString(CONF_DB_DIALECT, role);
+		String driver = config.getString(CONF_DB_DRIVER, role);
 
 		// make sure the Flyway migrations match with the current Hibernate classes
 		String hbm2ddlAuto = "validate";
@@ -86,7 +87,7 @@ public class HibernateUtil {
 			this.dbSchema = new DbSchema(role);
 
 			if (config.getBoolean(CONF_DB_EXPORT_SCHEMA, role)) {
-				this.dbSchema.export(hibernateClasses, dialect);
+				this.dbSchema.export(hibernateClasses, dialect, driver);
 			}
 
 			this.dbSchema.migrate(url, user, password);
@@ -113,7 +114,7 @@ public class HibernateUtil {
 		} catch (SchemaManagementException e) {
 
 			this.dbSchema.printSchemaError(e);
-			this.dbSchema.export(hibernateClasses, dialect);
+			this.dbSchema.export(hibernateClasses, dialect, driver);
 			throw e;
 		}
 	}

@@ -55,19 +55,21 @@ public class DbSchema {
      * @param file
 	 * @param dialect 
 	 * @param driver 
+	 * @param driver 
 	 * @param url 
 	 * @param url 
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 * @throws SQLException 
      */
-    public void exportHibernateSchema(List<Class<?>> hibernateClasses, String file, String dialect) {
+    public void exportHibernateSchema(List<Class<?>> hibernateClasses, String file, String dialect, String driver) {
     	
     	logger.info("export hibernate schema to " + file);
     	
     	Map<String, Object> settings = new HashMap<>();
     	
     	settings.put(Environment.DIALECT, dialect);
+    	settings.put(Environment.DRIVER, driver);    
 
 		/* Do not start connection pool
 		 * 
@@ -102,9 +104,9 @@ public class DbSchema {
     }
 
 
-	public void export(List<Class<?>> hibernateClasses, String dialect) {
+	public void export(List<Class<?>> hibernateClasses, String dialect, String driver) {
     	String exportFile = getExportFile();
-    	this.exportHibernateSchema(hibernateClasses, exportFile, dialect);
+    	this.exportHibernateSchema(hibernateClasses, exportFile, dialect, driver);
 	}
 
 	private String getExportFile() {

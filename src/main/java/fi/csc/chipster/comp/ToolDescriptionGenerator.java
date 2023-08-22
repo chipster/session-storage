@@ -29,7 +29,7 @@ public class ToolDescriptionGenerator {
 		// not interested in inputs, they were figured out when job was submitted
 		// I'm interested in inputs in java jobs
 		for (Input input : source.getInputs()) {
-			description.addInputFile(input.getName().getID());
+			description.addInputFile(input.getName(), input.isOptional());
 		}
 		
 		for (Output output : source.getOutputs()) {
@@ -37,7 +37,7 @@ public class ToolDescriptionGenerator {
 		}
 		
 		for (Parameter parameter : source.getParameters()) {
-			description.addParameter(new ToolDescription.ParameterDescription(parameter.getName().getID(), parameter.getDescription(), parameter.getType()));
+			description.addParameter(new ToolDescription.ParameterDescription(parameter.getName().getID(), parameter.getDescription(), parameter.getType(), parameter.getSelectionOptions()));
 		}
 		
 		return description;

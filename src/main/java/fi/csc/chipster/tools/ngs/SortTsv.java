@@ -34,7 +34,7 @@ public class SortTsv extends JavaCompJobBase {
 
 		try {
 			// files
-			File inputFile = new File(jobDataDir, toolDescription.getInputFiles().get(0).getFileName()); 
+			File inputFile = new File(jobDataDir, toolDescription.getInputFiles().get(0).getFileName().getID()); 
 			File outputFile = new File(jobDataDir, toolDescription.getOutputFiles().get(0).getFileName().getID());
 			
 			List<String> parameters = inputMessage.getParameters(JAVA_PARAMETER_SECURITY_POLICY, toolDescription);			

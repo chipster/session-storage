@@ -25,7 +25,7 @@ public abstract class RegionTool extends JavaCompJobBase {
 			RegionOperations tool = new RegionOperations();
 			LinkedList<List<Feature>> inputs = new LinkedList<List<Feature>>();
 			for (int i = 0; i < toolDescription.getInputFiles().size(); i++) {
-				File inputFile = new File(jobDataDir, toolDescription.getInputFiles().get(i).getFileName());
+				File inputFile = new File(jobDataDir, toolDescription.getInputFiles().get(i).getFileName().getID());
 				inputs.add(tool.loadFile(inputFile));
 			}
 

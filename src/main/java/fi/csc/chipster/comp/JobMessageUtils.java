@@ -2,8 +2,12 @@ package fi.csc.chipster.comp;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import fi.csc.chipster.comp.ToolDescription.ParameterDescription;
+import fi.csc.chipster.toolbox.sadl.SADLSyntax.ParameterType;
 
 public class JobMessageUtils {
 	/**
@@ -39,7 +43,7 @@ public class JobMessageUtils {
 					"number of parameter descriptions does not match the number of parameter values");
 		}
 
-		// Validate parameters
+		// Check if there are any disallowed characters in the parameter value 
 		Iterator<ParameterDescription> descriptionIterator = description.getParameters().iterator();
 		for (String parameter : parameters) {
 			ParameterDescription parameterDescription = descriptionIterator.next();
@@ -55,7 +59,23 @@ public class JobMessageUtils {
 				}
 			}
 		}
-
+		
+//	    // Check that the selected enum option exists
+//		// Should we check also other parameter constraints like integer limits?
+//        Iterator<ParameterDescription> descriptionIterator2 = description.getParameters().iterator();
+//        for (String parameter : parameters) {
+//            ParameterDescription parameterDescription = descriptionIterator2.next();
+//
+//            if (parameterDescription.getType() == ParameterType.ENUM) {
+//                Set<String> options = Stream.of(parameterDescription.getSelectionOptions()).map(o -> o.getID()).collect(Collectors.toSet());
+//                
+//                if (!options.contains(parameter)) {
+//                    throw new ParameterValidityException(
+//                            "enum parameter " + parameterDescription.getName() + " does not have option " + parameter);
+//                }
+//            }
+//        }
+				
 		// Everything was ok, return the parameters
 		return parameters;
 	}

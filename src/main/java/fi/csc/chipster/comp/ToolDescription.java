@@ -27,11 +27,13 @@ public class ToolDescription {
 		private String name;
 		private String comment;
 		private ParameterType type;
+        private Name[] selectionOptions;
 		
-		public ParameterDescription(String name, String comment, ParameterType type) {
+		public ParameterDescription(String name, String comment, ParameterType type, Name[] selectionOptions) {
 			this.name = name;
 			this.comment = comment;
 			this.type = type;
+			this.selectionOptions = selectionOptions;
 		}
 
 		public boolean isNumeric() {
@@ -53,6 +55,14 @@ public class ToolDescription {
 
 		public String getName() {
 			return name;
+		}
+		
+		public ParameterType getType() {
+		    return type;
+		}
+		
+		public Name[] getSelectionOptions() {
+		    return selectionOptions;
 		}
 	}
 	
@@ -88,15 +98,21 @@ public class ToolDescription {
 	 * Describes an input (parameter name and file name). 
 	 */
 	public static class InputDescription {
-        private String fileName;
+        private Name fileName;
+        private boolean optional;
 
-        public String getFileName() {
+        public Name getFileName() {
             return fileName;
         }
 	    
-	    public InputDescription(String fileName) {
+	    public InputDescription(Name fileName, boolean optional) {
 	        this.fileName = fileName;
+	        this.optional = optional;
 	    }
+
+        public boolean isOptional() {
+            return optional;
+        }
 	}
 
 	
@@ -199,8 +215,8 @@ public class ToolDescription {
 	}
 	
 
-	public void addInputFile(String fileName) {
-		inputFiles.add(new InputDescription(fileName));
+	public void addInputFile(Name fileName, boolean optional) {
+		inputFiles.add(new InputDescription(fileName, optional));
 	}
 	
 	public void addOutputFile(Name fileName, boolean optional, boolean meta) {

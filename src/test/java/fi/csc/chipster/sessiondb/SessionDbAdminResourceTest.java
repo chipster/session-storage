@@ -53,8 +53,7 @@ public class SessionDbAdminResourceTest {
 		// admin can get all sessions for user1
 		String user1IdString = launcher.getUser1Credentials().getUsername();
 		
-		@SuppressWarnings("unused")
-        String result = adminClient.getSessionsForUser(user1IdString);
+		String result = adminClient.getSessionsForUser(user1IdString);
 		
 //		// json example
 //		ObjectMapper mapper = new ObjectMapper();

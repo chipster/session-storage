@@ -339,9 +339,6 @@ scheduler-bash-pod-anti-affinity: true
 scheduler-bash-env-name-1: ""
 scheduler-bash-env-value-1: ""
 
-
-  
-scheduler-bash-max-slots: 100
       
 # how often to check if BashJobScheduler jobs are alive
 scheduler-bash-job-timer-interval: 10
@@ -373,7 +370,7 @@ toolbox-tools-bin-path: /opt/chipster/tools
 # default values for runtimes
 toolbox-runtime-job-factory: fi.csc.chipster.comp.r.RJobFactory
 toolbox-runtime-parameters: "--vanilla --quiet"
-toolbox-runtime-image: comp-16.04
+toolbox-runtime-image: comp-16-04
 toolbox-runtime-tools-bin-name: chipster-3.5.1
 toolbox-runtime-tools-bin-path: tools
 

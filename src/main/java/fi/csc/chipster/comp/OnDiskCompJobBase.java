@@ -190,22 +190,22 @@ public abstract class OnDiskCompJobBase extends CompJob {
 				return;
 			}
 
-            // add all described files to the result message
-            for (File outputFile : describedFiles) {
-                // copy file to file broker
-                try {
-                    File phenodataFileForThisOutput = 
-                            outputFile.getName().endsWith(".tsv") ||
-                            outputFile.getName().endsWith(".shared") ||
-                            outputFile.getName().endsWith(".Rda") ? phenodataFile : null;
-                    
-                    String nameInClient = nameMap.get(outputFile.getName());
-                    String nameInSessionDb = nameInClient != null ? nameInClient : outputFile.getName();
-                    String dataId = resultHandler.getFileBrokerClient().addFile(
-                            UUID.fromString(inputMessage.getJobId()), inputMessage.getSessionId(), outputFile, nameInSessionDb, fileDescription.isMeta(), phenodataFileForThisOutput);
-                    // put dataId to result message
-                    this.addOutputDataset(outputFile.getName(), dataId, nameInClient);
-                    logger.debug("transferred output file: " + fileDescription.getFileName());
+			// add all described files to the result message
+			for (File outputFile : describedFiles) {
+				// copy file to file broker
+				try {
+					File phenodataFileForThisOutput = 
+							outputFile.getName().endsWith(".tsv") ||
+							outputFile.getName().endsWith(".shared") ||
+							outputFile.getName().endsWith(".Rda") ? phenodataFile : null;
+					
+					String nameInClient = nameMap.get(outputFile.getName());
+					String nameInSessionDb = nameInClient != null ? nameInClient : outputFile.getName();
+					String dataId = resultHandler.getFileBrokerClient().addFile(
+							UUID.fromString(inputMessage.getJobId()), inputMessage.getSessionId(), outputFile, nameInSessionDb, fileDescription.isMeta(), phenodataFileForThisOutput);
+					// put dataId to result message. Preserve the order of outputs in tool
+					this.addOutputDataset(outputFile.getName(), dataId, nameInClient, fileDescription.getFileName().getDisplayName());
+					logger.debug("transferred output file: " + fileDescription.getFileName());
 
                 } catch (FileNotFoundException e) {
                     // required output file not found

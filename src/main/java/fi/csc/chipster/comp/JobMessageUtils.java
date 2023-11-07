@@ -2,12 +2,8 @@ package fi.csc.chipster.comp;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import fi.csc.chipster.comp.ToolDescription.ParameterDescription;
-import fi.csc.chipster.toolbox.sadl.SADLSyntax.ParameterType;
 
 public class JobMessageUtils {
 	/**

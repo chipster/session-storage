@@ -17,6 +17,7 @@ import fi.csc.chipster.comp.ToolDescription.ParameterDescription;
 import fi.csc.chipster.scheduler.offer.JobCommand;
 import fi.csc.chipster.sessiondb.model.Input;
 import fi.csc.chipster.sessiondb.model.Job;
+import fi.csc.chipster.sessiondb.model.MetadataFile;
 import fi.csc.chipster.sessiondb.model.Parameter;
 
 public class RestJobMessage implements GenericJobMessage {
@@ -39,7 +40,11 @@ public class RestJobMessage implements GenericJobMessage {
 	public String getJobId() {
 		return job.getJobId().toString();
 	}
-
+	
+	public List<MetadataFile> getMetadataFiles() {
+	    return job.getMetadataFiles();
+	}
+	
 	public Set<String> getKeys() {
 		// phenodata inputs are no longer job inputs, they are handled separately in
 		// preExecute()

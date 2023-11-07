@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import fi.csc.chipster.sessiondb.model.MetadataFile;
+
 /**
  * Use this interface instead of the original JobMessage on the comp. The
  * original class has a JMS dependency, which we don't want in the new system
@@ -19,6 +21,8 @@ public interface GenericJobMessage {
 	public String getUsername();
 
 	public String getToolId();
+	
+	public List<MetadataFile> getMetadataFiles();
 
 	public Set<String> getKeys() throws Exception;
 

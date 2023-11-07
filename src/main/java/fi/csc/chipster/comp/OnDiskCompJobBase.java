@@ -317,6 +317,10 @@ public abstract class OnDiskCompJobBase extends CompJob {
 
         Set<String> boundInputs = new HashSet<>();
         
+        Set<String> metadataFileNames = inputMessage.getMetadataFiles().stream()
+                .map(mf -> mf.getName())
+                .collect(Collectors.toSet());
+        
         /* Check inputs
          * 
          * Bind all inputs in the job message to inputs in the tool
@@ -364,13 +368,17 @@ public abstract class OnDiskCompJobBase extends CompJob {
                     boundInputs.add(inputName);
 
                 } else if (!input.isOptional()){
-                    logger.error("required input file not found");
-                    this.setErrorMessage(
-                        "The tool has required input " + input.getFileName().getID()
-                        + " but the job didn't have any input files for it: "
-                        + RestUtils.asJson(inputMessage.getKeys().toArray()));
-                    updateState(JobState.ERROR);
-                    return; 
+                    
+                    // if not phenodata.tsv
+                    if (!metadataFileNames.contains(inputName)) {
+                        logger.error("required input file not found");
+                        this.setErrorMessage(
+                            "The tool has required input " + input.getFileName().getID()
+                            + " but the job didn't have any input files for it: "
+                            + RestUtils.asJson(inputMessage.getKeys().toArray() + " " + RestUtils.asJson(metadataFileNames)));
+                        updateState(JobState.ERROR);
+                        return; 
+                    }
                 }                
             }
         }

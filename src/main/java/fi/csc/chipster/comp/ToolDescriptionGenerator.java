@@ -17,7 +17,9 @@ public class ToolDescriptionGenerator {
 
 	/**
 	 * Converts generic SADLDescription to ToolDescription.
-	 */
+	 * 
+	 * @return ToolDescription
+	 */	
 	public ToolDescription generate(SADLDescription source) {
 		ToolDescription description = new ToolDescription();
 		
@@ -37,7 +39,7 @@ public class ToolDescriptionGenerator {
 		}
 		
 		for (Parameter parameter : source.getParameters()) {
-			description.addParameter(new ToolDescription.ParameterDescription(parameter.getName().getID(), parameter.getDescription(), parameter.getType(), parameter.getSelectionOptions()));
+			description.addParameter(parameter);
 		}
 		
 		return description;

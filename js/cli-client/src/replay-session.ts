@@ -1,4 +1,4 @@
-import { Dataset, Job, JobParameter, Module, PhenodataUtils, Session, Tool, ToolParameter } from "chipster-js-common";
+import { Dataset, Job, Module, PhenodataUtils, Session, Tool } from "chipster-js-common";
 import MetadataFile from "chipster-js-common/lib/model/metadata-file";
 import { Logger, RestClient } from "chipster-nodejs-core";
 import * as _ from "lodash";
@@ -439,10 +439,12 @@ export default class ReplaySession {
           allTools
         )
       ),
-      // mergeMap(() => {
-      //   // TODO should be done after all jobs for session have been run, not in the end like this
-      //   return this.deleteTempSessions(Array.from(tempSessionsToDelete));
-      // }),
+      
+      mergeMap(() => {
+        // TODO should be done after all jobs for session have been run, not in the end like this
+        return this.deleteTempSessions(Array.from(tempSessionsToDelete));
+      }),
+
       tap(() => {
         logger.info("test set " + testSet + " took " + humanizeDuration(Date.now() - this.startTime.getTime()));
         this.restClient = null;
@@ -697,56 +699,33 @@ export default class ReplaySession {
         });
         return concat(...fileCopies).pipe(toArray());
       }),
-      mergeMap(() =>
-      this.restClient.getTool(job.toolId).pipe(
-        catchError(err => {
-          if (err.statusCode === 404) {
-            return throwError(
-              new VError({
-                name: this.toolNotFoundError,
-                info: {
-                  toolId: job.toolId
-                },
-                cause: err
-              })
-            );
-          }
-          return throwError(err);
-        })
-      )
-    ),
-    tap((t: Tool) => (tool = t)),
       tap(() => {
-
-        // create map of tool parameters to make them easier to find
-        let toolParameterMap = new Map<string, ToolParameter>(
-          tool.parameters.map(p => [ p.name.id, p])
-        );
-
         job.parameters.forEach(p => {
-          // check that parameter still exists
-          let toolParameter = toolParameterMap.get(p.parameterId);
-          if (toolParameter == null) {
-            throwError("parameter not found " + p.parameterId);
-          }
-
-          // check that parameter still has the selected enum option
-          if (toolParameter.type == "ENUM") {
-            let optionIds = toolParameter.selectionOptions.map(o => o.id);
-
-            if (!optionIds.includes(p.value)) {
-              logger.info("enum parameter " + toolParameter.name.id + " does not have option " + p.value + " (" + optionIds + ")")
-              //FIXME how to report error?
-              // throwError("enum parameter " + toolParameter.name.id + " does not have option " + p.value + " (" + toolParameter.selectionOptions + ")")
-            }
-          }
-
           parameterMap.set(p.parameterId, p.value);
           if (!quiet) {
             logger.info("set parameter " + p.parameterId + " " + p.value);
           }
         });
       }),
+      mergeMap(() =>
+        this.restClient.getTool(job.toolId).pipe(
+          catchError(err => {
+            if (err.statusCode === 404) {
+              return throwError(
+                new VError({
+                  name: this.toolNotFoundError,
+                  info: {
+                    toolId: job.toolId
+                  },
+                  cause: err
+                })
+              );
+            }
+            return throwError(err);
+          })
+        )
+      ),
+      tap((t: Tool) => (tool = t)),
       tap(() => {
         metadataFiles = this.bindPhenodata(
           job,
@@ -763,21 +742,16 @@ export default class ReplaySession {
         wsClient = new WsClient(this.restClient);
         wsClient.connect(replaySessionId, quiet);
       }),
-      mergeMap(() => {
-
-        inputMap.forEach((value: Dataset, key: String) => {
-          logger.info("input ", key, ": ", value);
-        });
-
-        return ChipsterUtils.jobRunWithMetadata(
+      mergeMap(() =>
+        ChipsterUtils.jobRunWithMetadata(
           this.restClient,
           replaySessionId,
           tool,
           parameterMap,
           inputMap,
           metadataFiles
-        );
-      }),
+        )
+      ),
       mergeMap(jobId => {
         replayJobId = jobId;
 

@@ -9,9 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import com.nimbusds.jose.shaded.gson.Gson;
 import com.nimbusds.jose.shaded.gson.GsonBuilder;
 
+import fi.csc.chipster.comp.ToolDescription.InputDescription;
 import fi.csc.chipster.comp.ToolDescription.OutputDescription;
 import fi.csc.chipster.rest.RestUtils;
 
@@ -35,9 +38,9 @@ public abstract class OnDiskCompJobBase extends CompJob {
 	
 	class VersionJson {
 	    @SuppressWarnings("unused")
-		private String application;
+		private final String application;
 	    @SuppressWarnings("unused")
-		private String version;
+		private final String version;
 
 	    public VersionJson(String application, String version) {
 	        this.application = application;
@@ -48,7 +51,7 @@ public abstract class OnDiskCompJobBase extends CompJob {
 	}
 	
 	
-	private static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 
 	private static final String JOB_DATA_DIR_NAME = "data";
 	private static final String JOB_TOOLBOX_DIR_NAME = "toolbox";
@@ -123,13 +126,13 @@ public abstract class OnDiskCompJobBase extends CompJob {
             this.setOutputText(Exceptions.getStackTrace(e));
             logger.error("transferring input data and tools failed", e);
             updateState(JobState.ERROR);
-            return;
         }
     }
 
     /**
      * Copy output files from job work dir to file broker.
      * 
+     * @throws JobCancelledException
      */
     @Override
     protected void postExecute() throws JobCancelledException {
@@ -176,7 +179,7 @@ public abstract class OnDiskCompJobBase extends CompJob {
 
 			// parse a file containing file names for the client
 			String outputsFilename = "chipster-outputs.tsv";
-			LinkedHashMap<String, String> nameMap = new LinkedHashMap<>();
+			LinkedHashMap<String, String> nameMap;
 			try {
 				nameMap = ToolUtils.parseOutputDescription(new File(jobDataDir, outputsFilename));
 			} catch (IOException | CompException e) {
@@ -338,7 +341,6 @@ public abstract class OnDiskCompJobBase extends CompJob {
                         // found
                         boundInputs.add(messageInput);
                         found = true;
-                        continue;
                     }
                 }
 
@@ -440,11 +442,15 @@ public abstract class OnDiskCompJobBase extends CompJob {
 
     /**
      * Find files in a given directory whose filenames match given regex.
-     */
+     * 
+     * @param dir
+     * @param regex
+     * @return File[]
+     */    
     public static File[] findFiles(File dir, String regex) {
 
         class RegexFileFilter implements FilenameFilter {
-            private String regex;
+            private final String regex;
 
             public RegexFileFilter(String regex) {
                 this.regex = regex;
